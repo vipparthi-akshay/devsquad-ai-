@@ -1,0 +1,33 @@
+{
+  "name": "devsquad-ai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "An auditable AI engineering team that turns product requirements into plans, code changes, tests, reviews, and pull requests.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:api": "cd apps/api && uv run uvicorn app.main:app --reload --port 8000",
+    "dev:web": "cd apps/web && npm run dev",
+    "build": "npm run build:web",
+    "build:web": "cd apps/web && npm run build",
+    "lint": "npm run lint:web",
+    "lint:web": "cd apps/web && npm run lint",
+    "typecheck": "cd apps/web && npm run typecheck",
+    "test": "npm run test:api && npm run test:web",
+    "test:api": "cd apps/api && uv run pytest",
+    "test:web": "cd apps/web && npm run test",
+    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:stop": "pm2 stop ecosystem.config.js",
+    "pm2:restart": "pm2 restart ecosystem.config.js",
+    "pm2:status": "pm2 status",
+    "pm2:logs": "pm2 logs --lines 50",
+    "pm2:save": "pm2 save",
+    "pm2:startup": "pm2 startup"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
