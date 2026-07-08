@@ -31,7 +31,7 @@ jobs:
       - name: Install dependencies
         run: uv sync
       - name: Run lint
-        run: uv run ruff check .
+        run: uv run ruff check . -v
       - name: Run type check
         run: uv run mypy app
       - name: Run tests
@@ -55,6 +55,6 @@ jobs:
       - name: Run type check
         run: npm run typecheck
       - name: Run tests
-        run: npm run test
+        run: npm run test -- --reporter=verbose
       - name: Build
         run: npm run build
