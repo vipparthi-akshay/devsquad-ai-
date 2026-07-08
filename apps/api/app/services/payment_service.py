@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import stripe
 from sqlalchemy import select
@@ -182,8 +182,8 @@ class PaymentService:
         )
         sub = result.scalar_one_or_none()
 
-        period_start = datetime.fromtimestamp(sub_data["current_period_start"], tz=timezone.utc) if sub_data.get("current_period_start") else None
-        period_end = datetime.fromtimestamp(sub_data["current_period_end"], tz=timezone.utc) if sub_data.get("current_period_end") else None
+        period_start = datetime.fromtimestamp(sub_data["current_period_start"], tz=UTC) if sub_data.get("current_period_start") else None
+        period_end = datetime.fromtimestamp(sub_data["current_period_end"], tz=UTC) if sub_data.get("current_period_end") else None
 
         if sub:
             sub.status = sub_data["status"]
@@ -228,7 +228,6 @@ class PaymentService:
             )
 
     async def _handle_subscription_updated(self, sub: dict) -> None:
-        customer_id = sub["customer"]
         result = await self.db.execute(
             select(Subscription).where(
                 Subscription.stripe_subscription_id == sub["id"]
@@ -238,8 +237,8 @@ class PaymentService:
         if existing:
             plan_id = sub.get("metadata", {}).get("plan_id") or existing.plan_id
             existing.status = sub["status"]
-            existing.current_period_start = datetime.fromtimestamp(sub["current_period_start"], tz=timezone.utc)
-            existing.current_period_end = datetime.fromtimestamp(sub["current_period_end"], tz=timezone.utc)
+            existing.current_period_start = datetime.fromtimestamp(sub["current_period_start"], tz=UTC)
+            existing.current_period_end = datetime.fromtimestamp(sub["current_period_end"], tz=UTC)
             existing.cancel_at_period_end = sub.get("cancel_at_period_end", False)
             existing.plan_id = plan_id
             await self.db.flush()

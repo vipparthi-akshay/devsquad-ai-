@@ -574,7 +574,7 @@ export default function LandingPage() {
                 Join the Team
               </h2>
               <p className="mt-4 text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                Help us build the future of AI-native software engineering. We're looking for passionate people who love solving hard problems.
+                Help us build the future of AI-native software engineering. We&apos;re looking for passionate people who love solving hard problems.
               </p>
             </div>
           </FadeInSection>
@@ -685,7 +685,7 @@ export default function LandingPage() {
                   Get in Touch
                 </h2>
                 <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-md">
-                  Have questions about DevSquad AI? Want to schedule a demo or discuss enterprise pricing? We'd love to hear from you.
+                  Have questions about DevSquad AI? Want to schedule a demo or discuss enterprise pricing? We&apos;d love to hear from you.
                 </p>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
