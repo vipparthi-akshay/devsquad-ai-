@@ -62,17 +62,11 @@ jobs:
         run: uv run mypy app --verbose
 
       - name: Run tests
-        run: PYTHONPATH=. uv run pytest -v --tb=long --showlocals 2>&1 | tee pytest_output.txt
+        run: PYTHONPATH=. uv run pytest -v --tb=long --showlocals
         env:
           DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/devsquad
           JWT_SECRET: test-secret
           APP_ENV: test
-
-      - uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: pytest-output
-          path: apps/api/pytest_output.txt
 
   frontend:
     runs-on: ubuntu-latest
