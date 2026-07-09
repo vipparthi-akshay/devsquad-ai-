@@ -64,13 +64,6 @@ jobs:
       - name: Run type check
         run: uv run mypy app --verbose
 
-      - name: Debug DB connection
-        run: PYTHONPATH=. uv run python tests/check_db.py
-        env:
-          DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/devsquad
-          JWT_SECRET: test-secret
-          APP_ENV: test
-
       - name: Run tests
         run: PYTHONPATH=. uv run pytest -v --tb=long --showlocals
         env:

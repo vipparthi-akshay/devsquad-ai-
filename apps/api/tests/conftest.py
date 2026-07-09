@@ -6,11 +6,7 @@ from app.core.database import Base, engine
 from app.main import app
 
 
-@pytest.fixture(autouse=True)
-async def setup_db():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    yield
+async def _drop_everything():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         if engine.dialect.name == "postgresql":
@@ -19,6 +15,15 @@ async def setup_db():
             )).fetchall()
             for (typname,) in rows:
                 await conn.execute(text(f"DROP TYPE IF EXISTS \"{typname}\" CASCADE"))
+
+
+@pytest.fixture(autouse=True)
+async def setup_db():
+    await _drop_everything()
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+    await _drop_everything()
 
 
 @pytest.fixture
