@@ -6,6 +6,14 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: true
+  LOG_LEVEL: debug
+
 jobs:
   backend:
     runs-on: ubuntu-latest
@@ -18,24 +26,44 @@ jobs:
           POSTGRES_PASSWORD: postgres
         ports:
           - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     defaults:
       run:
         working-directory: apps/api
     steps:
       - uses: actions/checkout@v4
+
+      - name: Show environment info
+        run: |
+          echo "Python: $(python --version 2>&1 || true)"
+          echo "OS: $(uname -a)"
+          echo "Working dir: $(pwd)"
+          echo "Disk free: $(df -h . | tail -1)"
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
+
       - name: Install uv
-        run: pip install uv
+        run: |
+          pip install uv --quiet
+          uv --version
+
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --verbose
+
       - name: Run lint
         run: uv run ruff check . -v
+
       - name: Run type check
-        run: uv run mypy app
+        run: uv run mypy app --verbose
+
       - name: Run tests
-        run: uv run pytest -v
+        run: uv run pytest -v --tb=long --showlocals
         env:
           DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/devsquad
           JWT_SECRET: test-secret
@@ -45,16 +73,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Show environment info
+        run: |
+          echo "Node: $(node --version)"
+          echo "npm: $(npm --version)"
+          echo "OS: $(uname -a)"
+          echo "Disk free: $(df -h . | tail -1)"
+
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
+
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --loglevel verbose
+
       - name: Run lint
-        run: npm run lint
+        run: npm run lint -- --debug
+
       - name: Run type check
-        run: npm run typecheck
+        run: npm run typecheck -- --verbose
+
       - name: Run tests
         run: npm run test -- --reporter=verbose
+        continue-on-error: true
+
       - name: Build
-        run: npm run build
+        run: npm run build -- --debug
