@@ -65,14 +65,14 @@ jobs:
         run: uv run mypy app --verbose
 
       - name: Debug DB connection
-        run: uv run python tests/check_db.py
+        run: PYTHONPATH=. uv run python tests/check_db.py
         env:
           DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/devsquad
           JWT_SECRET: test-secret
           APP_ENV: test
 
       - name: Run tests
-        run: uv run pytest -v --tb=long --showlocals
+        run: PYTHONPATH=. uv run pytest -v --tb=long --showlocals
         env:
           DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/devsquad
           JWT_SECRET: test-secret
