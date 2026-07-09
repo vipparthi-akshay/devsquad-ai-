@@ -1,29 +1,33 @@
 import pytest
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database import Base, engine
+from app.core.database import Base, engine, async_session_factory
 from app.main import app
+from app.core.database import get_db
 
 
-async def _drop_everything():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-        if engine.dialect.name == "postgresql":
-            rows = (await conn.execute(
-                text("SELECT typname FROM pg_type WHERE typtype = 'e'")
-            )).fetchall()
-            for (typname,) in rows:
-                await conn.execute(text(f"DROP TYPE IF EXISTS \"{typname}\" CASCADE"))
-
-
-@pytest.fixture(autouse=True)
-async def setup_db():
-    await _drop_everything()
+@pytest.fixture(scope="session", autouse=True)
+async def create_tables():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
-    await _drop_everything()
+
+
+@pytest.fixture(autouse=True)
+async def transaction():
+    conn = await engine.connect()
+    trans = await conn.begin()
+    session = AsyncSession(bind=conn)
+
+    async def override_get_db():
+        yield session
+
+    app.dependency_overrides[get_db] = override_get_db
+    yield
+    await trans.rollback()
+    await conn.close()
+    app.dependency_overrides.clear()
 
 
 @pytest.fixture
