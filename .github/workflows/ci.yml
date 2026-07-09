@@ -53,10 +53,7 @@ jobs:
           uv --version
 
       - name: Install dependencies
-        run: uv sync --verbose
-
-      - name: Install lint tools
-        run: uv pip install ruff mypy pytest pytest-asyncio httpx
+        run: uv sync --all-extras --verbose
 
       - name: Run lint
         run: uv run ruff check . -v
