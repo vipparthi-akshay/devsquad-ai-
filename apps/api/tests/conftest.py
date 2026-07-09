@@ -2,9 +2,8 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database import Base, engine, async_session_factory
+from app.core.database import Base, engine, get_db
 from app.main import app
-from app.core.database import get_db
 
 
 @pytest.fixture(scope="session", autouse=True)
