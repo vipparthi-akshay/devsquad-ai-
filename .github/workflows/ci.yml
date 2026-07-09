@@ -54,7 +54,7 @@ jobs:
           uv --version
 
       - name: Install dependencies
-        run: uv sync --verbose
+        run: uv sync --all-extras --verbose
 
       - name: Run lint
         run: uv run ruff check . -v
