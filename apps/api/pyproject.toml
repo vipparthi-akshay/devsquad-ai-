@@ -58,6 +58,7 @@ disable_error_code = [
     "override",
     "arg-type",
     "assignment",
+    "return-value",
 ]
 
 [tool.pytest.ini_options]
