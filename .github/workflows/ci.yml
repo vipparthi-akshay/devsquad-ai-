@@ -65,28 +65,14 @@ jobs:
         run: uv run mypy app --verbose
 
       - name: Debug DB connection
-        run: |
-          uv run python -c "
-import asyncio, os
-os.environ['DATABASE_URL'] = 'postgresql+asyncpg://postgres:postgres@localhost:5432/devsquad'
-from app.core.config import settings
-from app.core.database import engine
-async def check():
-    try:
-        async with engine.begin() as conn:
-            print('DB CONNECTION OK')
-            await conn.run_sync(lambda _: print('SCHEMA SYNC OK'))
-    except Exception as e:
-        print(f'DB ERROR: {type(e).__name__}: {e}')
-asyncio.run(check())
-"
+        run: uv run python tests/check_db.py
         env:
           DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/devsquad
           JWT_SECRET: test-secret
           APP_ENV: test
 
       - name: Run tests
-        run: uv run pytest -v --tb=long --showlocals --capture=no 2>&1 | head -100
+        run: uv run pytest -v --tb=long --showlocals
         env:
           DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/devsquad
           JWT_SECRET: test-secret
