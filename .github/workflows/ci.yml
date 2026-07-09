@@ -63,18 +63,18 @@ jobs:
 
       - name: Run tests
         run: |
-          PYTHONPATH=. uv run pytest -v --tb=long --showlocals 2>&1 | tee pytest_output.txt
-          exit ${PIPESTATUS[0]}
+          set +o pipefail
+          PYTHONPATH=. uv run pytest -v --tb=long --showlocals 2>&1 > /tmp/pytest_raw.txt
+          code=$?
+          if [ $code -ne 0 ]; then
+            errors=$(grep -E "(FAILED|ERROR|assert)" /tmp/pytest_raw.txt | head -5 | tr '\n' ';')
+            echo "::error file=.github/workflows/ci.yml,line=1,title=pytest failed::$errors"
+          fi
+          exit $code
         env:
           DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/devsquad
           JWT_SECRET: test-secret
           APP_ENV: test
-
-      - uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: pytest-output
-          path: apps/api/pytest_output.txt
 
   frontend:
     runs-on: ubuntu-latest
