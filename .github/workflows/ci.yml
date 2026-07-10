@@ -93,8 +93,7 @@ jobs:
         run: npm run typecheck -- --verbose
 
       - name: Run tests
-        run: npm run test -- --reporter=verbose
-        continue-on-error: true
+        run: npm run test:web -- --reporter=verbose
 
       - name: Build
         run: npm run build
