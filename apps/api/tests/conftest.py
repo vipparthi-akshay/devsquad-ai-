@@ -8,19 +8,9 @@ from app.core.database import Base, engine, get_db
 from app.main import app
 
 
-@pytest.fixture(scope="session")
-def event_loop():
-    """Create a session-scoped event loop for async fixtures."""
-    import asyncio
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    yield loop
-    loop.close()
-
-
 @pytest.fixture(scope="session", autouse=True)
-async def setup_engine(event_loop):
-    """Create tables once. Use a fresh engine to avoid event-loop conflicts."""
+async def setup_engine():
+    """Create tables once."""
     engine = create_async_engine(settings.database_url, echo=settings.debug)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)

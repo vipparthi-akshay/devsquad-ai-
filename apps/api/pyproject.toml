@@ -63,4 +63,5 @@ disable_error_code = [
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+asyncio_event_loop_scope = "session"
 testpaths = ["tests"]
