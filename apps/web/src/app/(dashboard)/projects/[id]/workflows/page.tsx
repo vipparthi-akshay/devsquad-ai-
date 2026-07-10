@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useParams } from "next/navigation"
 import { workflows, demo, type WorkflowResponse } from "@/lib/api"
 import { Button } from "@/components/ui/Button"
@@ -85,7 +85,7 @@ export default function WorkflowsPage() {
   const [createType, setCreateType] = useState("full_pipeline")
   const [isCreating, setIsCreating] = useState(false)
 
-  async function loadWorkflows() {
+  const loadWorkflows = useCallback(async () => {
     setIsLoading(true)
     setError(null)
     try {
@@ -96,11 +96,11 @@ export default function WorkflowsPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [projectId])
 
   useEffect(() => {
     loadWorkflows()
-  }, [projectId])
+  }, [loadWorkflows])
 
   async function handleCreate() {
     if (!createName.trim()) return

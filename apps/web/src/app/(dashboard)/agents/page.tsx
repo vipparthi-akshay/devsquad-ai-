@@ -110,7 +110,7 @@ export default function AgentsPage() {
     setEvents((prev) => [msg, ...prev].slice(0, 50))
   }, [])
 
-  async function loadAgents() {
+  const loadAgents = useCallback(async () => {
     setIsLoading(true)
     setError(null)
     try {
@@ -131,11 +131,11 @@ export default function AgentsPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [addEvent])
 
   useEffect(() => {
     loadAgents()
-  }, [])
+  }, [loadAgents])
 
   function handleAgentClick(agent: AgentWithStatus) {
     setSelectedAgent(agent)

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useParams } from "next/navigation"
 import { api, type RequirementResponse } from "@/lib/api"
 import { formatDate, getStatusColor } from "@/lib/utils"
@@ -53,7 +53,7 @@ export default function RequirementsPage() {
   const [editValue, setEditValue] = useState("")
   const [approving, setApproving] = useState(false)
 
-  const fetchRequirements = async () => {
+  const fetchRequirements = useCallback(async () => {
     try {
       const list = await api.requirements.list(projectId)
       const data = list[list.length - 1] || null
@@ -63,11 +63,11 @@ export default function RequirementsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [projectId])
 
   useEffect(() => {
     fetchRequirements()
-  }, [projectId])
+  }, [fetchRequirements])
 
   const handleGenerate = async () => {
     setGenerating(true)
