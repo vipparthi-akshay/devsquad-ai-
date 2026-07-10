@@ -1,27 +1,15 @@
 import pytest
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.config import settings
 from app.core.database import Base, engine, get_db
 from app.main import app
 
 
 @pytest.fixture(scope="session", autouse=True)
-async def setup_engine():
-    """Create tables once."""
-    engine = create_async_engine(settings.database_url, echo=settings.debug)
+async def create_tables():
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-        if "postgresql" in str(engine.url):
-            rows = (await conn.execute(
-                text("SELECT typname FROM pg_type WHERE typtype = 'e'")
-            )).fetchall()
-            for (typname,) in rows:
-                await conn.execute(text(f"DROP TYPE IF EXISTS \"{typname}\" CASCADE"))
         await conn.run_sync(Base.metadata.create_all)
-    await engine.dispose()
 
 
 @pytest.fixture(autouse=True)
