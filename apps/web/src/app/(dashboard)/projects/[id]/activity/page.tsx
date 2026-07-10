@@ -96,6 +96,11 @@ export default function ActivityPage() {
   const [autoRefresh, setAutoRefresh] = useState(false)
   const [displayCount, setDisplayCount] = useState(20)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const activityListRef = useRef<EventResponse[]>([])
+
+  useEffect(() => {
+    activityListRef.current = activityList
+  }, [activityList])
 
   const loadActivities = useCallback(async () => {
     try {
@@ -103,7 +108,7 @@ export default function ActivityPage() {
       setActivityList(data)
       setError(null)
     } catch (err) {
-      if (!activityList.length) {
+      if (!activityListRef.current.length) {
         const mock: EventResponse[] = [
           { id: "e1", project_id: projectId, workspace_id: "w1", event_type: "PROJECT_CREATED", title: "Project initialized", description: "DevSquad AI project created", agent_type: null, metadata_json: null, created_at: new Date(Date.now() - 86400000 * 3).toISOString() },
           { id: "e2", project_id: projectId, workspace_id: "w1", event_type: "WORKFLOW_STARTED", title: "Requirements workflow started", description: "Full pipeline workflow initiated for requirement gathering", agent_type: "pm", metadata_json: null, created_at: new Date(Date.now() - 86400000 * 2).toISOString() },

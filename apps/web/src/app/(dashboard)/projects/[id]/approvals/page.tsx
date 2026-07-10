@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import { useParams } from "next/navigation"
 import { approvals as approvalsApi, type ApprovalResponse } from "@/lib/api"
 import { Card, CardContent, CardHeader } from "@/components/ui/Card"
@@ -60,7 +60,7 @@ export default function ProjectApprovalsPage() {
   const [rejectionReason, setRejectionReason] = useState("")
   const [isActing, setIsActing] = useState(false)
 
-  async function loadApprovals() {
+  const loadApprovals = useCallback(async () => {
     setIsLoading(true)
     setError(null)
     try {
@@ -110,11 +110,11 @@ export default function ProjectApprovalsPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [projectId])
 
   useEffect(() => {
     loadApprovals()
-  }, [projectId])
+  }, [loadApprovals])
 
   const filteredApprovals = useMemo(() => {
     if (activeTab === "all") return approvalList

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useParams } from "next/navigation"
 import { api, type ArchitectureResponse } from "@/lib/api"
 import { formatDate, getSeverityColor } from "@/lib/utils"
@@ -19,7 +19,7 @@ export default function ArchitecturePage() {
   const [generating, setGenerating] = useState(false)
   const [challenging, setChallenging] = useState(false)
 
-  const fetchArchitecture = async () => {
+  const fetchArchitecture = useCallback(async () => {
     try {
       const list = await api.architecture.list(projectId)
       const data = list[list.length - 1] || null
@@ -29,11 +29,11 @@ export default function ArchitecturePage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [projectId])
 
   useEffect(() => {
     fetchArchitecture()
-  }, [projectId])
+  }, [fetchArchitecture])
 
   const handleGenerate = async () => {
     setGenerating(true)
